@@ -32,4 +32,11 @@ class PlaceViewModel : ViewModel() {
     fun searchPlaces(query: String) {
         searchLiveData.value = query
     }
+
+    //进行一层封装(搜索过的地点保存在本地的SharedPreferences文件中)
+    fun savePlace(place: Place) = Repository.savePlace(place)
+
+    fun getSavedPlace() = Repository.getSavedPlace()
+
+    fun isPlaceSaved() =Repository.isPlaceSaved()
 }

@@ -1,14 +1,18 @@
 package com.sunnyweather.android.ui.weather
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.sunnyweather.android.R
@@ -37,8 +41,31 @@ class WeatherActivity : AppCompatActivity() {
         val decorView = window.decorView
         decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE       //or：位运算符，即 | 符号
-
         window.statusBarColor = Color.TRANSPARENT
+
+        navBtn.setOnClickListener {
+            //点击切换城市按钮，打开DrawerLayout布局的滑动菜单(抽屉)页面
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+
+        drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
+            override fun onDrawerStateChanged(newState: Int) { }
+
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) { }
+
+            //当抽屉(滑动菜单)被隐藏时，手动隐藏弹出的输入法
+            override fun onDrawerClosed(drawerView: View) {
+
+                val manager = getSystemService(Context.INPUT_METHOD_SERVICE)
+                        as InputMethodManager
+
+                manager.hideSoftInputFromWindow(drawerView.windowToken,
+                    InputMethodManager.HIDE_NOT_ALWAYS)
+            }
+
+            override fun onDrawerOpened(drawerView: View) { }
+
+        })
 
         //从Intent(来源PlaceAdapter.kt第30行)中取出所查询地区的经纬度和名称
         if (viewModel.locationLng.isEmpty()) {
@@ -62,9 +89,22 @@ class WeatherActivity : AppCompatActivity() {
                 Toast.makeText(this, "无法成功获取天气信息", Toast.LENGTH_SHORT).show()
                 result.exceptionOrNull()?.printStackTrace()
             }
+
+            swipeRefresh.isRefreshing = false       //用于表示刷新事件结束，并隐藏下拉刷新进度条
         })
 
+        swipeRefresh.setColorSchemeResources(R.color.colorPrimary)      //设置下拉刷新进度条颜色
+
+        refreshWeather()     //执行一次刷新天气的请求，同时显示下拉刷新进度条
+
+        swipeRefresh.setOnRefreshListener {
+            refreshWeather()
+        }
+    }
+
+    fun refreshWeather() {
         viewModel.refreshWeather(viewModel.locationLng, viewModel.locationLat)
+        swipeRefresh.isRefreshing = true
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -116,4 +156,5 @@ class WeatherActivity : AppCompatActivity() {
 
         weatherLayout.visibility = View.VISIBLE     //显示天气界面，默认是invisible
     }
+    
 }

@@ -1,21 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/weatherLayout"
-    android:scrollbars="none"
-    android:overScrollMode="never"
-    android:visibility="invisible"
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/drawerLayout">
 
-    <LinearLayout
+    <!--DrawerLayout中的第1个子控件，用于显示主屏幕的内容-->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <include layout="@layout/now" />
-        <include layout="@layout/forecast" />
-        <include layout="@layout/life_index" />
+        <!--使用SwipeRefreshLayout实现下拉刷新其实很简单，
+        类似ScrollView，只能接受一个子布局，
+        然后在代码里设置OnRefreshListener监听，
+        最后在监听里获取刷新时的数据就可以了。-->
 
-    </LinearLayout>
+        <ScrollView
+            android:id="@+id/weatherLayout"
+            android:scrollbars="none"
+            android:overScrollMode="never"
+            android:visibility="invisible"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-</ScrollView>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <include layout="@layout/now" />
+                <include layout="@layout/forecast" />
+                <include layout="@layout/life_index" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!--DrawerLayout中的第2个子控件，用于显示滑动菜单(抽屉)中的内容-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@color/colorPrimary">
+
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="25dp"
+            android:id="@+id/placeFragment"
+            android:name="com.sunnyweather.android.ui.place.PlaceFragment" />
+
+    </FrameLayout>
+
+
+</androidx.drawerlayout.widget.DrawerLayout>
+
+

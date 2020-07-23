@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.sunnyweather.android.MainActivity
 import com.sunnyweather.android.R
 import com.sunnyweather.android.ui.weather.WeatherActivity
 import kotlinx.android.synthetic.main.fragment_place.*
@@ -33,9 +34,12 @@ class PlaceFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         //对存储在本地的搜索记录(搜索过的地点)进行存储状态的判断和读取
-        if (viewModel.isPlaceSaved()) {
+        //，之前已经
+        if (activity is MainActivity && viewModel.isPlaceSaved()) {
 
-            //如果存在搜索记录(App中保存有搜索过的地点信息)，就获取并通过Intent传递给天气页面
+            //满足以下全部条件，才会自动跳转到上一次搜索过的地点的天气信息页面。
+            //1、存在搜索记录(App中保存有上一次搜索过的地点信息)，
+            //2、此时的PlaceFragment是嵌入在MainActivity中的(注意：在天气页面中也嵌入了PlaceFragment)，
 
             val place = viewModel.getSavedPlace()
             val intent = Intent(context, WeatherActivity::class.java).apply {
@@ -45,8 +49,8 @@ class PlaceFragment : Fragment() {
             }
 
             startActivity(intent)
-//            activity?.finish()
-//            return
+            activity?.finish()
+            return
         }
 
         val layoutManager = LinearLayoutManager(activity)       //activity即getActivity()方法
